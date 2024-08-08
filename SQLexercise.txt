@@ -1,0 +1,64 @@
+#DDL
+create database store;
+
+create table countries (
+   code int primary key,
+   name varchar(20)not null unique ,
+   countinent_name varchar(20) not null
+
+);
+
+insert into countries values(34,'Spain','Europe');
+update countries set name='France' where code = 34;
+select * from countries;
+
+create table users(
+    id int primary key ,
+    full_name varchar(20) not null,
+    email varchar(20) not null unique,
+    gender char(1) check(gender='m'or gender='f'),
+    date_of_birth varchar(15) not null,
+    created_at datetime default CURRENT_TIMESTAMP,
+    country_code int,
+    foreign key (country_code) references countries (code)
+
+);
+
+insert into users values(1,'Omar','s@gmail.com','m', '2000/12/12', now(), 34);
+select * from users;
+
+create table products(
+     id int primary key ,
+     name varchar(10) not null,
+     price int default 0,
+     status varchar(10) check ( status = 'valid' or status = 'expired'),
+     created_at datetime default CURRENT_TIMESTAMP
+);
+
+insert into products values(3,'tv',400, 'valid', now());
+insert into products values(8,'mic',500, 'valid', now());
+
+delete from products where id = 8;
+select * from products;
+
+create table orders(
+   id int primary key,
+   user_id int unique,
+   foreign key (user_id) references users (id),
+   status varchar(6) check ( status = 'start' or status = 'finish'),
+   created_at datetime default CURRENT_TIMESTAMP
+);
+
+insert into orders values(4,1, 'start', now());
+select * from orders;
+
+create table order_products(
+   order_id int not null ,
+   foreign key (order_id) references orders (id),
+   product_id int not null ,
+   foreign key (product_id) references products (id),
+   quantity int default 0
+);
+
+insert into order_products values (4,3,70);
+select *from order_products;
