@@ -1,64 +1,50 @@
 #DDL
-create database store;
+create database netflix;
 
-create table countries (
-   code int primary key,
-   name varchar(20)not null unique ,
-   countinent_name varchar(20) not null
 
-);
-
-insert into countries values(34,'Spain','Europe');
-update countries set name='France' where code = 34;
-select * from countries;
-
-create table users(
-    id int primary key ,
-    full_name varchar(20) not null,
-    email varchar(20) not null unique,
-    gender char(1) check(gender='m'or gender='f'),
-    date_of_birth varchar(15) not null,
-    created_at datetime default CURRENT_TIMESTAMP,
-    country_code int,
-    foreign key (country_code) references countries (code)
+create table users (
+   UserID int primary key not null ,
+   Username varchar(30) not null unique ,
+   Email varchar(40) not null unique,
+   Password varchar(30) not null ,
+   CreatedAt timestamp default current_timestamp
 
 );
-
-insert into users values(1,'Omar','s@gmail.com','m', '2000/12/12', now(), 34);
+insert into users (UserID, username, email, password) values (1 ,'Omar Alshehri', 'omarShehri@example.com', 'securepassword123');
 select * from users;
 
-create table products(
-     id int primary key ,
-     name varchar(10) not null,
-     price int default 0,
-     status varchar(10) check ( status = 'valid' or status = 'expired'),
-     created_at datetime default CURRENT_TIMESTAMP
+create table subscriptions (
+   SubscriptionID int primary key ,
+   UserID int,
+   foreign key (UserID) references users(UserID),
+   PlanName varchar(30) not null ,
+   Price decimal,
+   DurationMonths int not null,
+   Features text
 );
+insert into subscriptions (subscriptionid, userid, planname, price, durationmonths, features)
+values (1001, 1, 'Premium Plan', 15.99, 12, 'Access to all movies and TV shows.');
 
-insert into products values(3,'tv',400, 'valid', now());
-insert into products values(8,'mic',500, 'valid', now());
-
-delete from products where id = 8;
-select * from products;
-
-create table orders(
-   id int primary key,
-   user_id int unique,
-   foreign key (user_id) references users (id),
-   status varchar(6) check ( status = 'start' or status = 'finish'),
-   created_at datetime default CURRENT_TIMESTAMP
+create table movies (
+    MovieID int primary key,
+    SubID int,
+    foreign key (SubID) references subscriptions(SubscriptionID),
+    Title varchar(50) not null ,
+    Genre varchar(50),
+    ReleaseYear int,
+    Duration int not null,
+    Description text not null
 );
+insert into movies (movieid, SubID, title, genre, releaseyear, duration, description)
+values (2, 1001, 'Inception', 'Sci-Fi', 2010, 148, 'A mind-bending thriller by Christopher Nolan.');
+select * from users;
 
-insert into orders values(4,1, 'start', now());
-select * from orders;
-
-create table order_products(
-   order_id int not null ,
-   foreign key (order_id) references orders (id),
-   product_id int not null ,
-   foreign key (product_id) references products (id),
-   quantity int default 0
+create table recommendations (
+      MovieID int,
+      UserID int ,
+      Rating decimal not null ,
+      foreign key (UserID) references users(UserID),
+      foreign key (MovieID) references movies(MovieID)
 );
-
-insert into order_products values (4,3,70);
-select *from order_products;
+insert into recommendations (movieid, userid, rating)
+values (2, 1, 4.5);
